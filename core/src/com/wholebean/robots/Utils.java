@@ -9,7 +9,7 @@ import com.badlogic.gdx.utils.Array;
  * Created by john on 8/28/18.
  */
 
-public class RobotsUtils {
+public class Utils {
     public static int indexFromCoords(Vector2 coords, int rowWidth) {
         return (int) (coords.x + (coords.y * rowWidth));
     }

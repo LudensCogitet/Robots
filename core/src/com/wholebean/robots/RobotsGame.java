@@ -1,6 +1,5 @@
 package com.wholebean.robots;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
@@ -9,12 +8,12 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
-public class RobotsGame extends Game {
+public class RobotsGame extends com.badlogic.gdx.Game {
 	private Screen currentScreen;
 	private Texture spriteSheet;
+	public Texture overlay;
 
 	public static SCREEN_ORIENTATION orientation;
 
@@ -28,13 +27,14 @@ public class RobotsGame extends Game {
 		LANDSCAPE
 	}
 
-	private static final int SPRITE_COUNT = 5;
+	private static final int SPRITE_COUNT = 6;
 	public enum SPRITE_INFO {
 		PLAYER_STANDING(0, 1),
 		PLAYER_WALKING(1, 3),
 		WALL_STATIC(2, 1),
 		JUNK_IDLE(3, 2),
-		ROBOT_IDLE(4, 3);
+		ROBOT_IDLE(4, 3),
+		HATCH(5, 2);
 
 		SPRITE_INFO(int index, int frameCount) {
 			this.INDEX 		 = index;
@@ -62,10 +62,10 @@ public class RobotsGame extends Game {
 		this.spriteBatch = new SpriteBatch();
 
 		this.spriteSheet = new Texture(Gdx.files.internal("spriteSheet.png"));
-
+		this.overlay = new Texture(Gdx.files.internal("overlay.png"));
 		this.generateGraphics();
 
-		this.currentScreen = new RobotsMenuScreen(this);
+		this.currentScreen = new Menu(this);
 		this.setScreen(this.currentScreen);
 	}
 
@@ -79,18 +79,19 @@ public class RobotsGame extends Game {
 		this.font.dispose();
 		this.spriteBatch.dispose();
 		this.spriteSheet.dispose();
+		this.overlay.dispose();
 		this.currentScreen.dispose();
 
 	}
 
 	public void startGame() {
 		this.currentScreen.dispose();
-		this.currentScreen = new RobotsGameScreen(this);
+		this.currentScreen = new Main(this);
 		this.setScreen(this.currentScreen);
 	}
 
 	private void generateGraphics() {
-		TextureRegion[][] tiles = RobotsUtils.fixBleeding(TextureRegion.split(this.spriteSheet, 16, 16));
+		TextureRegion[][] tiles = Utils.fixBleeding(TextureRegion.split(this.spriteSheet, 16, 16));
 		if(RobotsGame.SPRITE_COUNT != tiles.length) {
 			throw new java.lang.Error("Sprite sheet contains more rows than number of sprites");
 		}

@@ -12,39 +12,37 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 
 /**
  * Created by john on 8/27/18.
  */
 
-public class RobotsMenuScreen implements Screen {
-    private RobotsGame game;
+public class Menu implements Screen {
+    private RobotsGame robotsGame;
 
     private Animation<TextureRegion> animation;
     private float timeAccumulator = 0f;
 
     private Stage stage;
 
-    RobotsMenuScreen(RobotsGame gameReference) {
-        this.game = gameReference;
+    Menu(RobotsGame robotsGameReference) {
+        this.robotsGame = robotsGameReference;
 
-        this.stage = new Stage(new StretchViewport(RobotsPlayfield.logicalScreenWidth, RobotsPlayfield.logicalScreenHeight));
+        this.stage = new Stage(new StretchViewport(Playfield.logicalScreenWidth, Playfield.logicalScreenHeight));
         VerticalGroup buttonGroup = new VerticalGroup();
         buttonGroup.setFillParent(true);
 
         TextButton.TextButtonStyle buttonStyle = new TextButton.TextButtonStyle();
 
-        buttonStyle.font = this.game.font;
+        buttonStyle.font = this.robotsGame.font;
         buttonStyle.fontColor = Color.WHITE;
         buttonStyle.overFontColor = Color.LIGHT_GRAY;
         buttonStyle.downFontColor = Color.NAVY;
 
         Label.LabelStyle titleStyle = new Label.LabelStyle();
 
-        titleStyle.font = this.game.font;
+        titleStyle.font = this.robotsGame.font;
         titleStyle.fontColor = Color.WHITE;
 
         Label title = new Label("Robots!", titleStyle);
@@ -53,21 +51,21 @@ public class RobotsMenuScreen implements Screen {
         startButton.addListener(new ClickListener() {
           @Override
           public void clicked(InputEvent event, float x, float y) {
-                game.startGame();
+                robotsGame.startGame();
             }
         });
 
         TextButton highScoreButton = new TextButton("High Scores", buttonStyle);
 
         buttonGroup.addActor(title);
-        buttonGroup.addActor(startButton.padBottom(RobotsPlayfield.spaceSize).padTop(RobotsPlayfield.spaceSize));
+        buttonGroup.addActor(startButton.padBottom(Playfield.spaceSize).padTop(Playfield.spaceSize));
         buttonGroup.addActor(highScoreButton);
 
-        this.stage.addActor(buttonGroup.padTop(RobotsPlayfield.spaceSize * 4));
+        this.stage.addActor(buttonGroup.padTop(Playfield.spaceSize * 4));
 
         Gdx.input.setInputProcessor(this.stage);
 
-        this.animation = new Animation<TextureRegion>(0.3f, this.game.graphics.get(RobotsGame.SPRITE_INFO.ROBOT_IDLE.INDEX));
+        this.animation = new Animation<TextureRegion>(0.3f, this.robotsGame.graphics.get(RobotsGame.SPRITE_INFO.ROBOT_IDLE.INDEX));
         this.animation.setPlayMode(Animation.PlayMode.LOOP_PINGPONG);
     }
 
@@ -83,20 +81,20 @@ public class RobotsMenuScreen implements Screen {
         this.stage.act(delta);
         this.stage.draw();
 
-        this.game.spriteBatch.setProjectionMatrix(this.stage.getViewport().getCamera().combined);
-        this.game.spriteBatch.begin();
+        this.robotsGame.spriteBatch.setProjectionMatrix(this.stage.getViewport().getCamera().combined);
+        this.robotsGame.spriteBatch.begin();
 
         TextureRegion frame = this.animation.getKeyFrame(this.timeAccumulator, true);
 
         for(float x = 14.8f; x < 17.8f; x++) {
-            this.game.spriteBatch.draw(
+            this.robotsGame.spriteBatch.draw(
                     frame,
-                    RobotsPlayfield.spaceSize * x,
-                    RobotsPlayfield.spaceSize * 14
+                    Playfield.spaceSize * x,
+                    Playfield.spaceSize * 14
             );
         }
 
-        this.game.spriteBatch.end();
+        this.robotsGame.spriteBatch.end();
     }
 
     @Override
