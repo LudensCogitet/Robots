@@ -24,7 +24,6 @@ public class Utils {
         return new Vector2(x, y);
     }
 
-
     public static Array<Integer> getShuffledRange(int size) {
         Array<Integer> range = new Array<Integer>(size);
 

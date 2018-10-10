@@ -10,8 +10,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 public class Hatch extends Entity {
     private boolean open = false;
 
-    Hatch(int position, RobotsGame robotsGameRef) {
-        super(TYPE.HATCH, position, 1f, robotsGameRef.graphics.get(RobotsGame.SPRITE_INFO.HATCH.INDEX));
+    Hatch(int position, Main main) {
+        super(TYPE.HATCH, position, 1f, main.robotsGameRef.graphics.get(RobotsGame.SPRITE_INFO.HATCH.INDEX), true);
     }
 
     @Override

@@ -24,7 +24,7 @@ public class Player extends Entity implements InputProcessor {
     private int teleportOffset = 0;
 
     Player(int position, Main gameScreen) {
-        super(TYPE.PLAYER, position, 0.4f, gameScreen.robotsGameRef.graphics.get(RobotsGame.SPRITE_INFO.PLAYER_WALKING.INDEX));
+        super(TYPE.PLAYER, position, 0.4f, gameScreen.robotsGameRef.graphics.get(RobotsGame.SPRITE_INFO.PLAYER_WALKING.INDEX), false);
         this.parent = gameScreen;
         this.phantom = this.parent.robotsGameRef.graphics.get(RobotsGame.SPRITE_INFO.PLAYER_STANDING.INDEX).get(0);
         this.phantomPosition = new Vector2(this.position);
@@ -52,7 +52,7 @@ public class Player extends Entity implements InputProcessor {
 
     private void teleport() {
         int teleportTo = this.teleportPosition;
-        while(!this.parent.playfield.spaceClear(teleportTo)) {
+        while(this.parent.playfield.spaceBlocked(teleportTo)) {
             teleportTo++;
 
             if(teleportTo == Playfield.numberOfSquares) {
@@ -75,7 +75,7 @@ public class Player extends Entity implements InputProcessor {
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
         this.drawPhantom = false;
 
-        if(this.parent.playfield.spaceClear(this.phantomPosition)) {
+        if(!this.parent.playfield.spaceBlocked(this.phantomPosition)) {
             this.position.set(this.phantomPosition);
         }
 
@@ -105,8 +105,8 @@ public class Player extends Entity implements InputProcessor {
             if(angle > 337.5f || angle < 22.5f) {
                 this.phantomPosition.x += distance;
                 if(distance > 1) {
-                    if(!this.parent.playfield.spaceClear(this.phantomPosition) ||
-                       !this.parent.playfield.spaceClear((int) this.phantomPosition.x - 1, (int) this.phantomPosition.y)) {
+                    if(this.parent.playfield.spaceBlocked(this.phantomPosition) ||
+                       this.parent.playfield.spaceBlocked((int) this.phantomPosition.x - 1, (int) this.phantomPosition.y)) {
                         this.phantomPosition.x--;
                     }
                 }
@@ -114,8 +114,8 @@ public class Player extends Entity implements InputProcessor {
                 this.phantomPosition.x += distance;
                 this.phantomPosition.y -= distance;
                 if(distance > 1) {
-                    if(!this.parent.playfield.spaceClear(this.phantomPosition) ||
-                       !this.parent.playfield.spaceClear((int) this.phantomPosition.x - 1, (int) this.phantomPosition.y + 1)) {
+                    if(this.parent.playfield.spaceBlocked(this.phantomPosition) ||
+                       this.parent.playfield.spaceBlocked((int) this.phantomPosition.x - 1, (int) this.phantomPosition.y + 1)) {
                         this.phantomPosition.x--;
                         this.phantomPosition.y++;
                     }
@@ -123,8 +123,8 @@ public class Player extends Entity implements InputProcessor {
             } else if(angle > 67.5f && angle < 112.5f) {
                 this.phantomPosition.y -= distance;
                 if(distance > 1) {
-                    if(!this.parent.playfield.spaceClear(this.phantomPosition) ||
-                            !this.parent.playfield.spaceClear((int) this.phantomPosition.x, (int) this.phantomPosition.y + 1)) {
+                    if(this.parent.playfield.spaceBlocked(this.phantomPosition) ||
+                       this.parent.playfield.spaceBlocked((int) this.phantomPosition.x, (int) this.phantomPosition.y + 1)) {
                         this.phantomPosition.y++;
                     }
                 }
@@ -132,8 +132,8 @@ public class Player extends Entity implements InputProcessor {
                 this.phantomPosition.x -= distance;
                 this.phantomPosition.y -= distance;
                 if(distance > 1) {
-                    if(!this.parent.playfield.spaceClear(this.phantomPosition) ||
-                            !this.parent.playfield.spaceClear((int) this.phantomPosition.x + 1, (int) this.phantomPosition.y + 1)) {
+                    if(this.parent.playfield.spaceBlocked(this.phantomPosition) ||
+                       this.parent.playfield.spaceBlocked((int) this.phantomPosition.x + 1, (int) this.phantomPosition.y + 1)) {
                         this.phantomPosition.x++;
                         this.phantomPosition.y++;
                     }
@@ -141,8 +141,8 @@ public class Player extends Entity implements InputProcessor {
             } else if(angle > 157.5f && angle < 202.5) {
                 this.phantomPosition.x -= distance;
                 if(distance > 1) {
-                    if(!this.parent.playfield.spaceClear(this.phantomPosition) ||
-                            !this.parent.playfield.spaceClear((int) this.phantomPosition.x + 1, (int) this.phantomPosition.y)) {
+                    if(this.parent.playfield.spaceBlocked(this.phantomPosition) ||
+                            this.parent.playfield.spaceBlocked((int) this.phantomPosition.x + 1, (int) this.phantomPosition.y)) {
                         this.phantomPosition.x++;
                     }
                 }
@@ -150,8 +150,8 @@ public class Player extends Entity implements InputProcessor {
                 this.phantomPosition.x -= distance;
                 this.phantomPosition.y += distance;
                 if(distance > 1) {
-                    if(!this.parent.playfield.spaceClear(this.phantomPosition) ||
-                            !this.parent.playfield.spaceClear((int) this.phantomPosition.x + 1, (int) this.phantomPosition.y - 1)) {
+                    if(this.parent.playfield.spaceBlocked(this.phantomPosition) ||
+                            this.parent.playfield.spaceBlocked((int) this.phantomPosition.x + 1, (int) this.phantomPosition.y - 1)) {
                         this.phantomPosition.x++;
                         this.phantomPosition.y--;
                     }
@@ -159,8 +159,8 @@ public class Player extends Entity implements InputProcessor {
             } else if(angle > 247.5f && angle < 292.5) {
                 this.phantomPosition.y += distance;
                 if(distance > 1) {
-                    if(!this.parent.playfield.spaceClear(this.phantomPosition) ||
-                            !this.parent.playfield.spaceClear((int) this.phantomPosition.x, (int) this.phantomPosition.y - 1)) {
+                    if(this.parent.playfield.spaceBlocked(this.phantomPosition) ||
+                            this.parent.playfield.spaceBlocked((int) this.phantomPosition.x, (int) this.phantomPosition.y - 1)) {
                         this.phantomPosition.y--;
                     }
                 }
@@ -168,15 +168,15 @@ public class Player extends Entity implements InputProcessor {
                 this.phantomPosition.x += distance;
                 this.phantomPosition.y += distance;
                 if(distance > 1) {
-                    if(!this.parent.playfield.spaceClear(this.phantomPosition) ||
-                            !this.parent.playfield.spaceClear((int) this.phantomPosition.x - 1, (int) this.phantomPosition.y - 1)) {
+                    if(this.parent.playfield.spaceBlocked(this.phantomPosition) ||
+                            this.parent.playfield.spaceBlocked((int) this.phantomPosition.x - 1, (int) this.phantomPosition.y - 1)) {
                         this.phantomPosition.x--;
                         this.phantomPosition.y--;
                     }
                 }
             }
 
-            if(!this.parent.playfield.spaceClear(this.phantomPosition)) {
+            if(this.parent.playfield.spaceBlocked(this.phantomPosition)) {
                 this.phantomPosition.set(this.position);
                 this.drawPhantom = false;
             }
