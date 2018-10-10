@@ -28,11 +28,15 @@ public class Main implements Screen {
     private StretchViewport viewport;
     private long seed = 1;
     private float wallFrequency = 0.1f;
-    private float robotDensity = 0.01f;
     private int numberOfSpawnPoints = 8;
     private Label seedDisplay;
+
+    private float robotDensity = 0.01f;
+    private int robotsToKill = 25;
+
     private int robotsOnField = 0;
     private int robotsKilled = 0;
+
     private float step = 0.85f;
 
     Main(RobotsGame robotsGameReference) {
@@ -64,7 +68,9 @@ public class Main implements Screen {
                 act();
                 resolve();
                 cleanUpEntities();
-                spawn();
+                if(robotsKilled < robotsToKill) {
+                    spawn();
+                }
             }
         }, this.step, this.step);
     }

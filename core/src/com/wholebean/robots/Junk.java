@@ -43,4 +43,10 @@ public class Junk extends Entity {
                 }
         }
     }
+
+    @Override
+    public void reset(int position) {
+        super.reset(position);
+        this.health = Junk.fullHealth;
+    }
 }
