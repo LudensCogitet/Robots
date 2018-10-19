@@ -45,6 +45,7 @@ public class Playfield implements Drawable {
     public float step = 0.85f;
     public int robotsToKill = 25;
     public float robotDensity = 0.01f;
+    public int overdriveCountdown = 10;
 
     private int spawnPointIndex = 0;
     private RandomXS128 placementGenerator;

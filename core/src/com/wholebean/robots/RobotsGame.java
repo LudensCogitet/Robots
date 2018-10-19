@@ -32,7 +32,7 @@ public class RobotsGame extends com.badlogic.gdx.Game {
 	public enum SPRITE_INFO {
 		PLAYER_STANDING(0, 1),
 		PLAYER_WALKING(1, 3),
-		WALL_STATIC(2, 1),
+		WALL_STATIC(2, 2),
 		JUNK_IDLE(3, 2),
 		ROBOT_IDLE(4, 3),
 		HATCH(5, 2);

@@ -14,7 +14,7 @@ public class Wall extends Entity {
     @Override
     public void draw(float delta, SpriteBatch batch) {
         batch.draw(
-                this.sprite.getKeyFrame(0),
+                this.solid ? this.sprite.getKeyFrame(0) : this.sprite.getKeyFrame(1),
                 Playfield.getScreenX((int) this.position.x),
                 Playfield.getScreenY((int) this.position.y)
         );
@@ -22,5 +22,13 @@ public class Wall extends Entity {
 
     @Override
     public void update(float delta) {
+    }
+
+    public void smash() {
+        this.solid = false;
+    }
+
+    public void repair() {
+        this.solid = true;
     }
 }

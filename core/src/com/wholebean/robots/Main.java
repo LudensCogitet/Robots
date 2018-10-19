@@ -57,6 +57,7 @@ public class Main implements Screen, InputProcessor {
     private static final int PAUSE = 3;
 
     private static int gameState = PLAYING;
+    private boolean suddenDeath = false;
 
     private Timer.Task actionLoop = new Timer.Task() {
         @Override
@@ -72,6 +73,10 @@ public class Main implements Screen, InputProcessor {
 
             if(Main.gameState == PLAYING && robotsKilled == playfield.robotsToKill) {
                 showWinScreen();
+            }
+
+            if(!suddenDeath) {
+                checkSuddenDeath();
             }
         }
     };
@@ -151,6 +156,23 @@ public class Main implements Screen, InputProcessor {
         if(newRobots != null) {
             this.robotsOnField += newRobots.size;
             this.entities.addAll(newRobots);
+        }
+    }
+
+    private void checkSuddenDeath() {
+        if(this.robotsKilled == this.playfield.robotsToKill - 1) {
+            for(int i = 0; i < this.entities.size; i++) {
+                Entity entity = this.entities.get(i);
+
+                if(entity.type == Entity.TYPE.ROBOT) {
+                    ((Robot) entity).enterOverdrive(this.playfield.overdriveCountdown);
+                    break;
+                }
+            }
+
+            Timer.instance().clear();
+            Timer.schedule(this.actionLoop, this.playfield.step / 2, this.playfield.step / 2);
+            this.suddenDeath = true;
         }
     }
 
@@ -266,6 +288,7 @@ public class Main implements Screen, InputProcessor {
 
     private void reset(int playerPos) {
         this.robotsKilled = 0;
+        this.suddenDeath = false;
         this.player.reset(playerPos);
         this.entities.clear();
         this.entities.add(this.player);

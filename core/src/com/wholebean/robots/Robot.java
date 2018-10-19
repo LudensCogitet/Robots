@@ -1,5 +1,6 @@
 package com.wholebean.robots;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 
 /**
@@ -9,9 +10,17 @@ import com.badlogic.gdx.math.Vector2;
 public class Robot extends Entity {
     Main parent;
 
+    private boolean overdrive = false;
+    private int selfDestruct = 0;
+
     Robot(int position, Main gameScreen) {
         super(TYPE.ROBOT, position, 0.3f, gameScreen.robotsGameRef.graphics.get(RobotsGame.SPRITE_INFO.ROBOT_IDLE.INDEX), false);
         this.parent = gameScreen;
+    }
+
+    public void enterOverdrive(int selfDestruct) {
+        this.overdrive = true;
+        this.selfDestruct = selfDestruct;
     }
 
     @Override
@@ -34,6 +43,15 @@ public class Robot extends Entity {
     public void act() {
         if(this.inactive) { return; }
 
+        if(this.overdrive) {
+            this.selfDestruct--;
+            if(this.selfDestruct <= 0) {
+                this.parent.killRobot(this);
+                this.parent.addJunk(Utils.indexFromCoords(this.position, Playfield.width));
+                return;
+            }
+        }
+
         Vector2 playerPosition = this.parent.player.getPosition();
         Vector2 newPos = new Vector2(this.position);
 
@@ -51,6 +69,19 @@ public class Robot extends Entity {
 
         if(!this.parent.playfield.spaceBlocked(newPos)) {
             this.position.set(newPos);
+        } else if(this.overdrive) {
+            Entity entity = this.parent.playfield.entityAtPosition(newPos);
+            if(entity.type == TYPE.WALL) {
+                ((Wall) entity).smash();
+                this.position.set(newPos);
+            }
         }
+    }
+
+    @Override
+    public void reset(int position) {
+        super.reset(position);
+        this.overdrive = false;
+        this.selfDestruct = 0;
     }
 }
