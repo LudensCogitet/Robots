@@ -19,4 +19,8 @@ public class Wall extends Entity {
                 Playfield.getScreenY((int) this.position.y)
         );
     }
+
+    @Override
+    public void update(float delta) {
+    }
 }

@@ -16,6 +16,11 @@ import com.badlogic.gdx.utils.JsonValue;
 public class Playfield implements Drawable {
     private Main parent;
 
+    private static final int STEP_INDEX = 0;
+    private static final int ROBOTS_TO_KILL_INDEX = 1;
+    private static final int ROBOT_DENSITY_INDEX = 2;
+    private static final int FIRST_BOARD_SPACE_INDEX = 3;
+
     public static final int logicalScreenWidth = 270;
     public static final int logicalScreenHeight = 480;
     public static final int spaceSize = 16;
@@ -35,6 +40,11 @@ public class Playfield implements Drawable {
     private Array<Entity> board = new Array<Entity>(Playfield.numberOfSquares);
     private Array<Hatch> robotSpawnPoints;
 
+    private Array<String> levelFiles = null;
+
+    public float step = 0.85f;
+    public int robotsToKill = 25;
+    public float robotDensity = 0.01f;
 
     private int spawnPointIndex = 0;
     private RandomXS128 placementGenerator;
@@ -49,10 +59,13 @@ public class Playfield implements Drawable {
         this.generateBoard(seed, wallFrequency, numberOfSpawnPoints);
     }
 
-    Playfield(Main parent, String boardFile) {
+    Playfield(Main parent, String[] files) {
         this.parent = parent;
+        this.levelFiles = new Array<String>(files);
 
-        this.loadBoard(boardFile);
+        for(int i = 0; i < Playfield.numberOfSquares; i++) {
+            this.board.add(null);
+        }
     }
 
     Playfield(Main parent) {
@@ -151,29 +164,48 @@ public class Playfield implements Drawable {
         }
     }
 
-    public Player loadBoard(String boardFile) {
+    public int loadBoard(int boardFileIndex) {
         JsonReader json = new JsonReader();
-        int[] board = json.parse(Gdx.files.internal(boardFile)).asIntArray();
+        int[] board = json.parse(Gdx.files.internal(this.levelFiles.get(boardFileIndex))).asIntArray();
+
+        this.step = ((float)board[Playfield.STEP_INDEX]) / 1000;
+        this.robotsToKill = board[Playfield.ROBOTS_TO_KILL_INDEX];
+        this.robotDensity = ((float)board[Playfield.ROBOT_DENSITY_INDEX]) / 1000;
+
+        Gdx.app.log("robotsToKill", Integer.toString(this.robotsToKill));
 
         this.robotSpawnPoints  = new Array<Hatch>();
 
-        Player player = null;
+        int playerPos = 0;
 
-        for(int i = 0; i < board.length; i++) {
+        for(int i = Playfield.FIRST_BOARD_SPACE_INDEX, pos = 0; i < board.length; i++, pos++) {
             if(board[i] == 1) {
-                this.board.add(new Wall(i, this.parent));
+                this.board.set(pos, new Wall(pos, this.parent));
             } else if(board[i] == 2) {
-                Hatch hatch = new Hatch(i, this.parent);
+                Hatch hatch = new Hatch(pos, this.parent);
                 this.robotSpawnPoints.add(hatch);
-                this.board.add(hatch);
+                this.board.set(pos, hatch);
             } else if(board[i] == 3) {
-                player = new Player(i, this.parent);
+                playerPos = pos;
+                this.board.set(pos, null);
             } else {
-                this.board.add(null);
+                this.board.set(pos, null);
             }
         }
 
-        return player;
+        return playerPos;
+    }
+
+    public void setStep(float step) {
+        this.step = step;
+    }
+
+    public void setRobotsToKill(int robotsToKill) {
+        this.robotsToKill = robotsToKill;
+    }
+
+    public void setRobotDensity(float density) {
+        this.robotDensity = density;
     }
 
     public boolean spaceBlocked(int position) {

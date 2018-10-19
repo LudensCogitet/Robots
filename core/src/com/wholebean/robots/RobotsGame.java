@@ -18,6 +18,7 @@ public class RobotsGame extends com.badlogic.gdx.Game {
 	public static SCREEN_ORIENTATION orientation;
 
 	public BitmapFont font;
+	public BitmapFont largeFont;
 
 	public SpriteBatch spriteBatch;
 	public Array<Array<TextureRegion>> graphics;
@@ -58,6 +59,9 @@ public class RobotsGame extends com.badlogic.gdx.Game {
 		param.size = 8;
 
 		this.font = gen.generateFont(param);
+
+		param.size = 16;
+		this.largeFont = gen.generateFont(param);
 
 		this.spriteBatch = new SpriteBatch();
 

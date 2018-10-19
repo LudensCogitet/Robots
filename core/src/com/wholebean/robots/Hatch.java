@@ -23,6 +23,11 @@ public class Hatch extends Entity {
         );
     }
 
+    @Override
+    public void update(float delta) {
+
+    }
+
     public void open() {
         this.open = true;
     }

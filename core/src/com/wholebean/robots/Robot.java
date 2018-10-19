@@ -16,7 +16,7 @@ public class Robot extends Entity {
 
     @Override
     public void react(Entity other, VERB verb) {
-        if(this.inactive) { return; }
+        if(this.inactive || other.isInactive()) { return; }
 
         switch(other.type) {
             case ROBOT:

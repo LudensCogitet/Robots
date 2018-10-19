@@ -23,12 +23,25 @@ public class Player extends Entity implements InputProcessor {
     private int teleportPosition = 0;
     private int teleportOffset = 0;
 
+    private boolean ignoreInput = false;
+
     Player(int position, Main gameScreen) {
         super(TYPE.PLAYER, position, 0.4f, gameScreen.robotsGameRef.graphics.get(RobotsGame.SPRITE_INFO.PLAYER_WALKING.INDEX), false);
         this.parent = gameScreen;
         this.phantom = this.parent.robotsGameRef.graphics.get(RobotsGame.SPRITE_INFO.PLAYER_STANDING.INDEX).get(0);
         this.phantomPosition = new Vector2(this.position);
         this.phantomPosition.y++;
+    }
+
+    public void reset(int position) {
+        this.setPosition(position);
+        this.setIgnoreInput(false);
+        this.phantomPosition.set(this.position);
+        this.touchPoint = null;
+    }
+
+    public void setIgnoreInput(boolean value) {
+        this.ignoreInput = value;
     }
 
     @Override
@@ -65,6 +78,8 @@ public class Player extends Entity implements InputProcessor {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        if(this.ignoreInput) { return false; }
+
         if(pointer == 0) {
             this.touchPoint = new Vector2(screenX, screenY);
         }
@@ -73,6 +88,8 @@ public class Player extends Entity implements InputProcessor {
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        if(this.ignoreInput) { return false; }
+
         this.drawPhantom = false;
 
         if(!this.parent.playfield.spaceBlocked(this.phantomPosition)) {
@@ -84,6 +101,8 @@ public class Player extends Entity implements InputProcessor {
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
+        if(this.ignoreInput || this.touchPoint == null) { return false; }
+
         if(pointer > 0) {
             return false;
         }
@@ -192,6 +211,8 @@ public class Player extends Entity implements InputProcessor {
 
     @Override
     public boolean keyUp(int keycode) {
+        if(this.ignoreInput) { return false; }
+
         if(keycode == Input.Keys.SPACE) {
             this.teleport();
         }

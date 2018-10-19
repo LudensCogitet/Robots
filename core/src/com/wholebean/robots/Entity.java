@@ -45,8 +45,10 @@ public class Entity implements Drawable {
     public void act() {}
     public void react() {}
     public void react(Entity other, VERB verb) {}
-    public void draw(float delta, SpriteBatch batch) {
+    public void update(float delta) {
         this.accumulator += delta;
+    }
+    public void draw(float delta, SpriteBatch batch) {
         batch.draw(
                 this.sprite.getKeyFrame(this.accumulator),
                 Playfield.getScreenX((int) this.position.x),

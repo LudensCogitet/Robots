@@ -46,7 +46,8 @@ public class Menu implements Screen {
         titleStyle.fontColor = Color.WHITE;
 
         Label title = new Label("Robots!", titleStyle);
-        title.setFontScale(1f);
+        title.setFontScale(2f);
+        title.pack();
         TextButton startButton = new TextButton("Start", buttonStyle);
         startButton.addListener(new ClickListener() {
           @Override
@@ -86,13 +87,12 @@ public class Menu implements Screen {
 
         TextureRegion frame = this.animation.getKeyFrame(this.timeAccumulator, true);
 
-        for(float x = 14.8f; x < 17.8f; x++) {
-            this.robotsGame.spriteBatch.draw(
-                    frame,
-                    Playfield.spaceSize * x,
-                    Playfield.spaceSize * 14
-            );
-        }
+        this.robotsGame.spriteBatch.draw(
+                frame,
+                Playfield.spaceSize * (Playfield.width / 2) - 4,
+                Playfield.spaceSize * 18
+        );
+
 
         this.robotsGame.spriteBatch.end();
     }
