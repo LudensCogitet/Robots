@@ -96,7 +96,7 @@ public class Main implements Screen, InputProcessor {
         int indicatorLabelY = Playfield.spaceSize * 29;
 
         this.timeElapsedLabel = new Label("00:00", indicatorStyle);
-        this.timeElapsedLabel.setPosition((Playfield.spaceSize + Playfield.spaceSize / 2), indicatorLabelY);
+        this.timeElapsedLabel.setPosition((Playfield.spaceSize + Playfield.spaceSize / 2) - 4, indicatorLabelY);
 
         this.levelLabel = new Label(Integer.toString(this.currentLevel + 1), indicatorStyle);
         this.levelLabel.setPosition((Playfield.logicalScreenWidth / 2) - 4, indicatorLabelY);
@@ -126,7 +126,7 @@ public class Main implements Screen, InputProcessor {
         this.ui.addActor(this.robotsLeftLabel);
         this.ui.addActor(this.notifications);
 
-        this.playfield = new Playfield(this, new String[]{"testBoard"});
+        this.playfield = new Playfield(this, new String[]{"level1"});
         this.player = new Player(this.playfield.loadBoard(0), this);
         Gdx.input.setInputProcessor(new InputMultiplexer(this.player, this));
 
@@ -148,7 +148,7 @@ public class Main implements Screen, InputProcessor {
 
         Array<Robot> newRobots = this.playfield.spawnRobots(
                 MathUtils.clamp(
-                        ((int)(Playfield.numberOfSquares * this.playfield.robotDensity) - this.robotsOnField),
+                        this.playfield.robotDensity - this.robotsOnField,
                         0,
                         this.playfield.robotsToKill - (robotsOnField + robotsKilled))
         );

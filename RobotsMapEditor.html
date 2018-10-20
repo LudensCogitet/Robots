@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html leng='en'>
+	<head>
+		<meta charset='utf-8'/>
+		<script>
+			const PLAYER_START = 232;
+			const NOTHING = 0;
+			const WALL = 1;
+			const HATCH = 2;
+			const PLAYER = 3;
+			const types = [
+				{name: 'nothing'},
+				{name: 'wall'},
+				{name: 'hatch'},
+				{name: 'player'}
+			];
+
+			const STEP_INDEX = 0;
+			const ROBOTS_TO_KILL_INDEX = 1;
+			const ROBOT_DENSITY_INDEX = 2;
+			const FIRST_BOARD_SPACE_INDEX = 3;
+
+			var board = [];
+			var cells = [];
+			var type = HATCH;
+			var playerPlaced = false;
+
+			function nextType() {
+				type++;
+				if(type >= types.length) type = WALL;
+				document.getElementById('typeDisplay').innerHTML = types[type].name;
+				return type;
+			}
+
+			function addClass(cell, type) {
+				for(var i = 0; i < types.length; i++) {
+					cell.classList.remove(types[i].name);
+				}
+				cell.classList.add(types[type].name);
+			}
+
+			function cellEventHandler(index, event) {
+				if(event.type === 'mouseover' && event.buttons !== 1) return;
+
+				if(type === PLAYER && playerPlaced && board[index] !== PLAYER) {
+					return;
+				}
+
+				if(board[index] === PLAYER) {
+					playerPlaced = false;
+				}
+
+				board[index] = board[index] === type ? board[index] = NOTHING : board[index] = type;
+				addClass(this, board[index]);
+				if(type === PLAYER) {
+					playerPlaced = board[index] === PLAYER;
+				}
+			}
+
+			function init() {
+				var width = 16;
+				var height = 28;
+				var base = document.getElementById('base');
+
+				var index = (width * height);
+				for(var i = 0; i < width * height; i++) {
+					board.push(NOTHING);
+				}
+
+				document.addEventListener('keyup', (event) => {
+					switch(event.key) {
+						case "Enter":
+							nextType();
+							break;
+						case "s":
+							serialize();
+							break;
+						case "l":
+							load();
+							break;
+					}
+				});
+
+				for(var y = height; y > 0; y--) {
+					index--;
+					var row = document.createElement('div');
+					row.classList.add('row');
+					var anchorCell = document.createElement('div');
+					anchorCell.classList.add('cell');
+					anchorCell.classList.add('anchor');
+					anchorCell.innerHTML = '&zwnj;';
+					anchorCell.onmousedown = cellEventHandler.bind(anchorCell, index);
+					anchorCell.onmouseover = cellEventHandler.bind(anchorCell, index);
+					cells.unshift(anchorCell);
+					row.appendChild(anchorCell);
+					for(var x = width -1; x > 0; x--) {
+						index--;
+						var cell = document.createElement('div');
+						cell.classList.add('cell');
+						cell.innerHTML = '&zwnj;';
+						cell.onmousedown = cellEventHandler.bind(cell, index);
+						cell.onmouseover = cellEventHandler.bind(cell, index);
+
+						cells.unshift(cell);
+						row.prepend(cell);
+					}
+					base.appendChild(row);
+				}
+				nextType();
+			}
+
+			function serialize() {
+				var stepFrequency = document.getElementById('stepFrequency').value;
+				var robotNumber = document.getElementById('robotNumber').value;
+				var robotDensity = document.getElementById('robotDensity').value;
+
+				document.getElementById('JSONfield').value = JSON.stringify([stepFrequency * 1000, +robotNumber, robotDensity].concat(board));
+			}
+
+			function randomize() {
+				var wallDensity = document.getElementById('wallDensity').value;
+
+				for(let i = 0; i < board.length; i++) {
+					if(Math.random() < wallDensity) {
+						board[i] = WALL;
+					} else {
+						board[i] = NOTHING;
+					}
+
+					addClass(cells[i], board[i]);
+				}
+			}
+
+			function load() {
+				var data = JSON.parse(document.getElementById('JSONfield').value);
+				board = data.slice(FIRST_BOARD_SPACE_INDEX);
+
+				document.getElementById('stepFrequency').value = data[STEP_INDEX] / 1000;
+				document.getElementById('robotNumber').value = data[ROBOTS_TO_KILL_INDEX];
+				document.getElementById('robotDensity').value = data[ROBOT_DENSITY_INDEX];
+
+				for(let i = 0; i < board.length; i++) {
+					addClass(cells[i], board[i]);
+				}
+			}
+
+			function copyJSON() {
+				let JSONfield = document.getElementById('JSONfield');
+				JSONfield.focus();
+				JSONfield.select();
+				document.execCommand('copy');
+			}
+
+			function clearJSONAndBoard() {
+				var JSONfield = document.getElementById('JSONfield');
+
+				if(JSONfield.value) {
+					JSONfield.value = '';
+				} else {
+					for(var i = 0; i < board.length; i++) {
+						board[i] = NOTHING;
+						addClass(cells[i], NOTHING);
+						board[PLAYER_START] = PLAYER;
+						addClass(cells[PLAYER_START], PLAYER);
+					}
+				}
+			}
+		</script>
+		<style>
+			#id {
+				display: flex;
+				flex-direction: column;
+			}
+
+			.main {
+				display: flex;
+			}
+
+			.row {
+				display: flex;
+			}
+
+			.cell {
+				width: 24px;
+				height: 24px;
+				border: 1px solid black;
+			}
+
+			.wall {background-color: darkred;}
+			.hatch {background-color: gray;}
+			.player {background-color: lightblue;}
+
+			textarea {
+				width: 300px;
+				height: 300px;
+			}
+
+			td input {
+				margin-left: 10px;
+			}
+
+		</style>
+	</head>
+	<body>
+		<div id="typeDisplay"></div>
+		<div class="main">
+			<div id="base">
+			</div>
+			<div>
+				<textarea id='JSONfield' onchange="this.blur()" onkeyup="this.blur()"></textarea>
+				<div>
+					<button onclick="serialize()">serialize</button>
+					<button onclick="load()">load</button>
+					<button onclick="copyJSON()">copy</button>
+					<button onclick="clearJSONAndBoard()">clear</button>
+					<button onclick="randomize()">randomize</button>
+				<div>
+				<div>
+					<table>
+						<tr>
+							<td>
+								<label>Step Frequency</label>
+							</td>
+							<td>
+								<input id="stepFrequency" type="number" value="0.80" step="0.01">
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<label>Robot Number</label>
+							</td>
+							<td>
+								<input id="robotNumber" type="number" value="10">
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<label>Robot Density</label>
+							</td>
+							<td>
+								<input id="robotDensity" type="number" value="4" step="1">
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<label>Wall Density</label>
+							</td>
+							<td>
+								<input id="wallDensity" type="number" value="0.3" step="0.01">
+							</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+		</div>
+		<script>
+			init();
+		</script>
+	</body>
+</html>

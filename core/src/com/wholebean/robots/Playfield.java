@@ -44,7 +44,7 @@ public class Playfield implements Drawable {
 
     public float step = 0.85f;
     public int robotsToKill = 25;
-    public float robotDensity = 0.01f;
+    public int robotDensity = 4;
     public int overdriveCountdown = 10;
 
     private int spawnPointIndex = 0;
@@ -171,7 +171,7 @@ public class Playfield implements Drawable {
 
         this.step = ((float)board[Playfield.STEP_INDEX]) / 1000;
         this.robotsToKill = board[Playfield.ROBOTS_TO_KILL_INDEX];
-        this.robotDensity = ((float)board[Playfield.ROBOT_DENSITY_INDEX]) / 1000;
+        this.robotDensity = board[Playfield.ROBOT_DENSITY_INDEX];
 
         Gdx.app.log("robotsToKill", Integer.toString(this.robotsToKill));
 
@@ -205,7 +205,7 @@ public class Playfield implements Drawable {
         this.robotsToKill = robotsToKill;
     }
 
-    public void setRobotDensity(float density) {
+    public void setRobotDensity(int density) {
         this.robotDensity = density;
     }
 
