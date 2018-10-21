@@ -2,12 +2,11 @@ package com.wholebean.robots;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.RandomXS128;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonReader;
-import com.badlogic.gdx.utils.JsonValue;
 
 /**
  * Created by john on 9/20/18.
@@ -20,6 +19,11 @@ public class Playfield implements Drawable {
     private static final int ROBOTS_TO_KILL_INDEX = 1;
     private static final int ROBOT_DENSITY_INDEX = 2;
     private static final int FIRST_BOARD_SPACE_INDEX = 3;
+
+    private static final int WALL = 1;
+    private static final int HATCH = 2;
+    private static final int PLAYER = 3;
+    private static final int ROBOT = 4;
 
     public static final int logicalScreenWidth = 270;
     public static final int logicalScreenHeight = 480;
@@ -95,7 +99,7 @@ public class Playfield implements Drawable {
             spawnPoint = this.robotSpawnPoints.get(currentIndex);
 
             if (!spawnPoint.isInactive() &&
-                this.parent.entityAt(spawnPoint.getPositionIndex()) == null) {
+                this.parent.entitiesAt(spawnPoint.getPositionIndex()) == null) {
                 spawnPoint.open();
                 spawnPoint.deactivate();
 
@@ -165,34 +169,45 @@ public class Playfield implements Drawable {
         }
     }
 
-    public int loadBoard(int boardFileIndex) {
+    public int loadBoard(int boardFileIndex, float stepModifier, float toKillModifier, float robotDensityModifier) {
         JsonReader json = new JsonReader();
         int[] board = json.parse(Gdx.files.internal(this.levelFiles.get(boardFileIndex))).asIntArray();
 
-        this.step = ((float)board[Playfield.STEP_INDEX]) / 1000;
-        this.robotsToKill = board[Playfield.ROBOTS_TO_KILL_INDEX];
-        this.robotDensity = board[Playfield.ROBOT_DENSITY_INDEX];
-
-        Gdx.app.log("robotsToKill", Integer.toString(this.robotsToKill));
+        this.step = (((float)board[Playfield.STEP_INDEX]) / 1000) + stepModifier;
+        this.robotsToKill = MathUtils.floor(board[Playfield.ROBOTS_TO_KILL_INDEX] * (1 + toKillModifier));
+        this.robotDensity = MathUtils.floor(board[Playfield.ROBOT_DENSITY_INDEX] * (1 + robotDensityModifier));
 
         this.robotSpawnPoints  = new Array<Hatch>();
+        this.spawnPointIndex = 0;
 
         int playerPos = 0;
 
         for(int i = Playfield.FIRST_BOARD_SPACE_INDEX, pos = 0; i < board.length; i++, pos++) {
-            if(board[i] == 1) {
+            if(board[i] == WALL) {
                 this.board.set(pos, new Wall(pos, this.parent));
-            } else if(board[i] == 2) {
+            } else if(board[i] == HATCH) {
                 Hatch hatch = new Hatch(pos, this.parent);
                 this.robotSpawnPoints.add(hatch);
                 this.board.set(pos, hatch);
-            } else if(board[i] == 3) {
+            } else if(board[i] == PLAYER) {
                 playerPos = pos;
                 this.board.set(pos, null);
+            } else if(board[i] == ROBOT) {
+              this.parent.addRobot(pos);
+              this.board.set(pos, null);
             } else {
                 this.board.set(pos, null);
             }
         }
+
+        int seed = 0;
+        for(int i = 0; i < board.length; i++) {
+            seed += board[i];
+        }
+
+        RandomXS128 rand = new RandomXS128(seed);
+
+        this.robotSpawnPoints = Utils.shuffleArray(rand, this.robotSpawnPoints);
 
         return playerPos;
     }

@@ -8,11 +8,13 @@
 			const WALL = 1;
 			const HATCH = 2;
 			const PLAYER = 3;
+			const ROBOT = 4;
 			const types = [
 				{name: 'nothing'},
 				{name: 'wall'},
 				{name: 'hatch'},
-				{name: 'player'}
+				{name: 'player'},
+				{name: 'robot'}
 			];
 
 			const STEP_INDEX = 0;
@@ -114,16 +116,28 @@
 				var robotNumber = document.getElementById('robotNumber').value;
 				var robotDensity = document.getElementById('robotDensity').value;
 
-				document.getElementById('JSONfield').value = JSON.stringify([stepFrequency * 1000, +robotNumber, robotDensity].concat(board));
+				document.getElementById('JSONfield').value = JSON.stringify([stepFrequency * 1000, +robotNumber, +robotDensity].concat(board));
 			}
 
 			function randomize() {
 				var wallDensity = document.getElementById('wallDensity').value;
+				var robotDensity = +document.getElementById('robotDensity').value;
+				var robotsPlaced = 0;
+
+				while(robotsPlaced < robotDensity) {
+					var index = Math.floor(Math.random() * board.length);
+					console.log(index);
+					if(board[index] !== ROBOT) {
+						board[index] = ROBOT;
+						addClass(cells[index], board[index]);
+						robotsPlaced++;
+					}
+				}
 
 				for(let i = 0; i < board.length; i++) {
 					if(Math.random() < wallDensity) {
-						board[i] = WALL;
-					} else {
+						if(board[i] !== ROBOT) { board[i] = WALL; }
+					} else if(board[i] !== ROBOT) {
 						board[i] = NOTHING;
 					}
 
@@ -189,6 +203,7 @@
 			.wall {background-color: darkred;}
 			.hatch {background-color: gray;}
 			.player {background-color: lightblue;}
+			.robot {background-color: green;}
 
 			textarea {
 				width: 300px;

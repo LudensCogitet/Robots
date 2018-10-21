@@ -2,6 +2,8 @@ package com.wholebean.robots;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.RandomXS128;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
@@ -58,5 +60,19 @@ public class Utils {
         region.setRegion((x + fix) * invTexWidth, (y + fix) * invTexHeight, (x + width - fix) * invTexWidth, (y + height - fix) * invTexHeight); // Trims
         // region
         return region;
+    }
+
+    public static <T> Array<T> shuffleArray(RandomXS128 rand, Array<T> array) {
+        int currentIndex = array.size;
+        int randomIndex;
+
+        while(0 != currentIndex) {
+            randomIndex = MathUtils.floor(rand.nextFloat() * currentIndex);
+            currentIndex--;
+
+            array.swap(currentIndex, randomIndex);
+        }
+
+        return array;
     }
 }

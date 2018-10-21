@@ -12,7 +12,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
@@ -49,7 +48,11 @@ public class Main implements Screen, InputProcessor {
     private int robotsOnField = 0;
     private int robotsKilled = 0;
     private int currentLevel = 0;
-    private final int numLevels = 1;
+    private final int numLevels = 2;
+
+    private float stepModifier = -0.05f;
+    private float toKillModifier = 0.5f;
+    private float robotDensityModifier = 0.1f;
 
     private static final int PLAYING = 0;
     private static final int WIN = 1;
@@ -72,7 +75,7 @@ public class Main implements Screen, InputProcessor {
             robotsLeftLabel.pack();
 
             if(Main.gameState == PLAYING && robotsKilled == playfield.robotsToKill) {
-                showWinScreen();
+                win();
             }
 
             if(!suddenDeath) {
@@ -126,13 +129,11 @@ public class Main implements Screen, InputProcessor {
         this.ui.addActor(this.robotsLeftLabel);
         this.ui.addActor(this.notifications);
 
-        this.playfield = new Playfield(this, new String[]{"level1"});
-        this.player = new Player(this.playfield.loadBoard(0), this);
+        this.playfield = new Playfield(this, new String[]{"level1", "level2"});
+        this.player = new Player(this.playfield.loadBoard(0, 0, 0, 0), this);
         Gdx.input.setInputProcessor(new InputMultiplexer(this.player, this));
 
         this.entities.add(this.player);
-
-        this.playfield.loadBoard(this.currentLevel);
 
         Timer.schedule(this.actionLoop, this.playfield.step, this.playfield.step);
     }
@@ -203,6 +204,10 @@ public class Main implements Screen, InputProcessor {
     public void addJunk(int position) {
         this.entities.add(this.getJunk(position));
     }
+    public void addRobot(int position) {
+        this.entities.add(this.getRobot(position));
+        this.robotsOnField++;
+    }
 
     public void killRobot(Entity robot) {
         if(robot.type != Entity.TYPE.ROBOT) { return; }
@@ -211,16 +216,17 @@ public class Main implements Screen, InputProcessor {
         robot.deactivate();
     }
 
-    public Entity entityAt(int position) {
+    public Array<Entity> entitiesAt(int position) {
         Entity entity;
+        Array<Entity> entities = new Array<Entity>();
         for(int i = 0; i < this.entities.size; i++) {
             entity = this.entities.get(i);
             if(entity.getPositionIndex() == position) {
-                return entity;
+                entities.add(entity);
             }
         }
 
-        return null;
+        return  entities.size > 0 ? entities : null;
     }
 
     private void resolve() {
@@ -267,7 +273,7 @@ public class Main implements Screen, InputProcessor {
         }
     }
 
-    private void showWinScreen() {
+    public void win() {
         this.player.setIgnoreInput(true);
         this.setGameState(WIN);
 
@@ -282,16 +288,48 @@ public class Main implements Screen, InputProcessor {
         this.notifications.setVisible(true);
     }
 
-    private void showLoseScreen() {
+    public void lose() {
+        this.player.setIgnoreInput(true);
+        this.setGameState(LOSE);
 
+        this.titleLabel.setText("You Lose!");
+        this.titleLabel.pack();
+
+        this.subtitleLabel.setText("Tap to play again");
+        this.subtitleLabel.pack();
+
+        this.notifications.setVisible(true);
     }
 
-    private void reset(int playerPos) {
-        this.robotsKilled = 0;
-        this.suddenDeath = false;
-        this.player.reset(playerPos);
+    private void reset() {
+        int levelIndex =  this.currentLevel < this.numLevels ? this.currentLevel : this.currentLevel % this.numLevels;
+        float modifier = this.currentLevel < this.numLevels ? 0 : MathUtils.floor(this.currentLevel / this.numLevels);
+
         this.entities.clear();
+        this.robotsKilled = 0;
+        this.robotsOnField = 0;
+        this.timeElapsed = 0;
+        this.suddenDeath = false;
+        this.player.reset(this.playfield.loadBoard(
+                levelIndex,
+                this.stepModifier * modifier,
+                this.toKillModifier * modifier,
+                this.robotDensityModifier * modifier
+        ));
         this.entities.add(this.player);
+
+        this.levelLabel.setText(Integer.toString(this.currentLevel));
+        this.levelLabel.pack();
+
+        this.robotsLeftLabel.setText((robotsKilled < 10 ? "0" + Integer.toString(robotsKilled) : Integer.toString(robotsKilled)) + "/" + Integer.toString(playfield.robotsToKill));
+        this.robotsLeftLabel.pack();
+
+        this.timeElapsedLabel.setText("00:00");
+        this.timeElapsedLabel.pack();
+
+        Gdx.app.log("step", Float.toString(this.playfield.step));
+        Gdx.app.log("robotsToKill", Integer.toString(this.playfield.robotsToKill));
+        Gdx.app.log("robotDensity", Integer.toString(this.playfield.robotDensity));
     }
 
     @Override
@@ -424,12 +462,14 @@ public class Main implements Screen, InputProcessor {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        if(Main.gameState == WIN) {
-            if(this.currentLevel == this.numLevels -1) {
+        if(Main.gameState == WIN || Main.gameState == LOSE) {
+            if(Main.gameState == WIN) {
+                this.currentLevel++;
+            } else {
                 this.currentLevel = 0;
             }
 
-            this.reset(this.playfield.loadBoard(this.currentLevel));
+            this.reset();
             this.setGameState(PLAYING);
             this.notifications.setVisible(false);
             return true;

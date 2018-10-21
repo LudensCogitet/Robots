@@ -1,10 +1,15 @@
 package com.wholebean.robots;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
+
+import static com.wholebean.robots.Entity.TYPE.JUNK;
+import static com.wholebean.robots.Entity.TYPE.ROBOT;
 
 /**
  * Created by john on 9/22/18.
@@ -30,7 +35,17 @@ public class Player extends Entity implements InputProcessor {
         this.parent = gameScreen;
         this.phantom = this.parent.robotsGameRef.graphics.get(RobotsGame.SPRITE_INFO.PLAYER_STANDING.INDEX).get(0);
         this.phantomPosition = new Vector2(this.position);
-        this.phantomPosition.y++;
+    }
+
+    private void checkCollision(Entity other) {
+        switch(other.type) {
+            case ROBOT:
+                this.parent.killRobot(other);
+                this.parent.addJunk(other.getPositionIndex());
+            case JUNK:
+                Gdx.app.log("JUNK switch", "here");
+                this.parent.lose();
+        }
     }
 
     public void reset(int position) {
@@ -42,6 +57,13 @@ public class Player extends Entity implements InputProcessor {
 
     public void setIgnoreInput(boolean value) {
         this.ignoreInput = value;
+    }
+
+    @Override
+    public void react(Entity other, VERB verb) {
+        if(verb == VERB.SAME_SPACE) {
+            this.checkCollision(other);
+        }
     }
 
     @Override
@@ -82,18 +104,32 @@ public class Player extends Entity implements InputProcessor {
 
         if(pointer == 0) {
             this.touchPoint = new Vector2(screenX, screenY);
+        } else {
+            this.teleport();
         }
         return false;
     }
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        if(this.ignoreInput) { return false; }
+        if(this.ignoreInput || pointer > 0) { return false; }
 
         this.drawPhantom = false;
 
         if(!this.parent.playfield.spaceBlocked(this.phantomPosition)) {
             this.position.set(this.phantomPosition);
+
+            Array<Entity> entities = this.parent.entitiesAt(this.getPositionIndex());
+
+            if(entities != null) {
+                for(int i = 0; i < entities.size; i++) {
+                    Entity entity = entities.get(i);
+                    if(entity.type == JUNK || entity.type == ROBOT) {
+                        this.checkCollision(entity);
+                        break;
+                    }
+                }
+            }
         }
 
         return false;
