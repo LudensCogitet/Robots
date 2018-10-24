@@ -48,7 +48,7 @@ public class Main implements Screen, InputProcessor {
     private int robotsOnField = 0;
     private int robotsKilled = 0;
     private int currentLevel = 0;
-    private final int numLevels = 2;
+    private final int numLevels = 3;
 
     private float stepModifier = -0.05f;
     private float toKillModifier = 0.5f;
@@ -59,7 +59,7 @@ public class Main implements Screen, InputProcessor {
     private static final int LOSE = 2;
     private static final int PAUSE = 3;
 
-    private static int gameState = PLAYING;
+    private int gameState = PLAYING;
     private boolean suddenDeath = false;
 
     private Timer.Task actionLoop = new Timer.Task() {
@@ -74,7 +74,7 @@ public class Main implements Screen, InputProcessor {
             robotsLeftLabel.setText((robotsKilled < 10 ? "0" + Integer.toString(robotsKilled) : Integer.toString(robotsKilled)) + "/" + Integer.toString(playfield.robotsToKill));
             robotsLeftLabel.pack();
 
-            if(Main.gameState == PLAYING && robotsKilled == playfield.robotsToKill) {
+            if(gameState == PLAYING && robotsKilled == playfield.robotsToKill) {
                 win();
             }
 
@@ -264,9 +264,9 @@ public class Main implements Screen, InputProcessor {
     }
 
     private void setGameState(int state) {
-        Main.gameState = state;
+        this.gameState = state;
 
-        if(Main.gameState == PLAYING) {
+        if(this.gameState == PLAYING) {
             Timer.schedule(this.actionLoop, this.playfield.step, this.playfield.step);
         } else {
             Timer.instance().clear();
@@ -342,7 +342,7 @@ public class Main implements Screen, InputProcessor {
 
         for(int i = 0; i < this.entities.size; i++) {
             Entity entity = this.entities.get(i);
-            if(Main.gameState == PLAYING) {
+            if(this.gameState == PLAYING) {
                 entity.update(delta);
             }
 
@@ -355,7 +355,7 @@ public class Main implements Screen, InputProcessor {
         this.levelLabel.setText(Integer.toString(this.currentLevel +1));
         this.levelLabel.pack();
 
-        if(Main.gameState == PLAYING) {
+        if(this.gameState == PLAYING) {
             this.timeElapsed += delta;
             int minutes = (int) this.timeElapsed / 60;
             int seconds = (int) this.timeElapsed % 60;
@@ -455,8 +455,8 @@ public class Main implements Screen, InputProcessor {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        if(Main.gameState == WIN || Main.gameState == LOSE) {
-            if(Main.gameState == WIN) {
+        if(this.gameState == WIN || this.gameState == LOSE) {
+            if(this.gameState == WIN) {
                 this.currentLevel++;
             } else {
                 this.currentLevel = 0;
