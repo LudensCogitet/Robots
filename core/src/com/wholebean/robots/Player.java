@@ -43,7 +43,6 @@ public class Player extends Entity implements InputProcessor {
                 this.parent.killRobot(other);
                 this.parent.addJunk(other.getPositionIndex());
             case JUNK:
-                Gdx.app.log("JUNK switch", "here");
                 this.parent.lose();
         }
     }
@@ -96,6 +95,7 @@ public class Player extends Entity implements InputProcessor {
         }
 
         this.position = Utils.coordsFromIndex(teleportTo, Playfield.width);
+        this.phantomPosition.set(this.position);
     }
 
     @Override
@@ -149,7 +149,7 @@ public class Player extends Entity implements InputProcessor {
             this.drawPhantom = true;
 
             int distance = 1;
-            if(this.touchPoint.dst(dragPoint) > Player.deadZone * 3f) {
+            if(this.touchPoint.dst(dragPoint) > Player.deadZone * 5f) {
                 distance = 2;
             }
 

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+	<!DOCTYPE html>
 <html leng='en'>
 	<head>
 		<meta charset='utf-8'/>
@@ -16,6 +16,9 @@
 				{name: 'player'},
 				{name: 'robot'}
 			];
+
+			const WIDTH = 16;
+			const HEIGHT = 28;
 
 			const STEP_INDEX = 0;
 			const ROBOTS_TO_KILL_INDEX = 1;
@@ -51,7 +54,7 @@
 				if(board[index] === PLAYER) {
 					playerPlaced = false;
 				}
-
+				console.log(index);
 				board[index] = board[index] === type ? board[index] = NOTHING : board[index] = type;
 				addClass(this, board[index]);
 				if(type === PLAYER) {
@@ -60,12 +63,10 @@
 			}
 
 			function init() {
-				var width = 16;
-				var height = 28;
 				var base = document.getElementById('base');
 
-				var index = (width * height);
-				for(var i = 0; i < width * height; i++) {
+				var index = (WIDTH * HEIGHT);
+				for(var i = 0; i < WIDTH * HEIGHT; i++) {
 					board.push(NOTHING);
 				}
 
@@ -83,7 +84,7 @@
 					}
 				});
 
-				for(var y = height; y > 0; y--) {
+				for(var y = HEIGHT; y > 0; y--) {
 					index--;
 					var row = document.createElement('div');
 					row.classList.add('row');
@@ -95,7 +96,7 @@
 					anchorCell.onmouseover = cellEventHandler.bind(anchorCell, index);
 					cells.unshift(anchorCell);
 					row.appendChild(anchorCell);
-					for(var x = width -1; x > 0; x--) {
+					for(var x = WIDTH -1; x > 0; x--) {
 						index--;
 						var cell = document.createElement('div');
 						cell.classList.add('cell');
@@ -119,14 +120,67 @@
 				document.getElementById('JSONfield').value = JSON.stringify([stepFrequency * 1000, +robotNumber, +robotDensity].concat(board));
 			}
 
+			function mirrorHorizontal() {
+				var maxX = Math.floor(WIDTH / 2);
+				for(var y = 0; y < HEIGHT; y++) {
+					for(var x = 0; x < maxX; x++) {
+						var index = x + (y * WIDTH);
+						var mirrorIndex = (WIDTH -1 + (y * WIDTH)) - x;
+						board[mirrorIndex] = board[index];
+						addClass(cells[mirrorIndex], board[mirrorIndex]);
+					}
+				}
+			}
+
+			function mirrorVertical() {
+				var maxY = Math.floor(HEIGHT / 2);
+				for(var y = 0; y < maxY; y++) {
+					for(var x = 0; x < WIDTH; x++) {
+						var index = x + (y * WIDTH);
+						var mirrorIndex = (((HEIGHT -1) * WIDTH) - (y * WIDTH)) + x;
+						board[mirrorIndex] = board[index];
+						addClass(cells[mirrorIndex], board[mirrorIndex]);
+					}
+				}
+			}
+
+			function doubleHorizontal() {
+				var maxX = Math.floor(WIDTH / 2);
+				for(var y = 0; y < HEIGHT; y++) {
+					for(var x = 0; x < maxX; x++) {
+						var index = x + (y * WIDTH);
+						var doubleIndex = index + maxX;
+						board[doubleIndex] = board[index];
+						addClass(cells[doubleIndex], board[doubleIndex]);
+					}
+				}
+			}
+
+			function doubleVertical() {
+				var maxY = Math.floor(HEIGHT / 2);
+				for(var y = 0; y < maxY; y++) {
+					for(var x = 0; x < WIDTH; x++) {
+						var index = x + (y * WIDTH);
+						var doubleIndex = ((y * WIDTH) + (maxY * WIDTH)) + x
+						board[doubleIndex] = board[index];
+						addClass(cells[doubleIndex], board[doubleIndex]);
+					}
+				}
+			}
+
 			function randomize() {
 				var wallDensity = document.getElementById('wallDensity').value;
 				var robotDensity = +document.getElementById('robotDensity').value;
 				var robotsPlaced = 0;
 
+				for(let i = 0; i < board.length; i++) {
+					board[i] = NOTHING;
+					addClass(cells[i], board[i]);
+				}
+
 				while(robotsPlaced < robotDensity) {
 					var index = Math.floor(Math.random() * board.length);
-					console.log(index);
+
 					if(board[index] !== ROBOT) {
 						board[index] = ROBOT;
 						addClass(cells[index], board[index]);
@@ -137,8 +191,6 @@
 				for(let i = 0; i < board.length; i++) {
 					if(Math.random() < wallDensity) {
 						if(board[i] !== ROBOT) { board[i] = WALL; }
-					} else if(board[i] !== ROBOT) {
-						board[i] = NOTHING;
 					}
 
 					addClass(cells[i], board[i]);
@@ -224,11 +276,15 @@
 			<div>
 				<textarea id='JSONfield' onchange="this.blur()" onkeyup="this.blur()"></textarea>
 				<div>
-					<button onclick="serialize()">serialize</button>
-					<button onclick="load()">load</button>
-					<button onclick="copyJSON()">copy</button>
-					<button onclick="clearJSONAndBoard()">clear</button>
-					<button onclick="randomize()">randomize</button>
+					<button onclick="serialize(); this.blur()">serialize</button>
+					<button onclick="load(); this.blur()">load</button>
+					<button onclick="copyJSON(); this.blur()">copy</button>
+					<button onclick="clearJSONAndBoard(); this.blur()">clear</button>
+					<button onclick="randomize(); this.blur()">randomize</button>
+					<button onclick="mirrorHorizontal(); this.blur()">mirror horizontal</button>
+					<button onclick="mirrorVertical(); this.blur()">mirror vertical</button>
+					<button onclick="doubleHorizontal(); this.blur()">double horizontal</button>
+					<button onclick="doubleVertical(); this.blur()">double vertical</button>
 				<div>
 				<div>
 					<table>

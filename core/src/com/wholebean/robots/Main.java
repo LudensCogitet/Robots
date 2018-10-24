@@ -129,7 +129,7 @@ public class Main implements Screen, InputProcessor {
         this.ui.addActor(this.robotsLeftLabel);
         this.ui.addActor(this.notifications);
 
-        this.playfield = new Playfield(this, new String[]{"level1", "level2"});
+        this.playfield = new Playfield(this, new String[]{"level0", "level1", "level2"});
         this.player = new Player(this.playfield.loadBoard(0, 0, 0, 0), this);
         Gdx.input.setInputProcessor(new InputMultiplexer(this.player, this));
 
@@ -326,10 +326,6 @@ public class Main implements Screen, InputProcessor {
 
         this.timeElapsedLabel.setText("00:00");
         this.timeElapsedLabel.pack();
-
-        Gdx.app.log("step", Float.toString(this.playfield.step));
-        Gdx.app.log("robotsToKill", Integer.toString(this.playfield.robotsToKill));
-        Gdx.app.log("robotDensity", Integer.toString(this.playfield.robotDensity));
     }
 
     @Override
@@ -382,8 +378,6 @@ public class Main implements Screen, InputProcessor {
             resolve();
             spawn();
             cleanUpEntities();
-            Gdx.app.log("Number of Entities:", Integer.toString(this.entities.size));
-            Gdx.app.log("Robots killed:", Integer.toString(this.robotsKilled));
 
             for(int i = 0; i < this.entities.size; i++) {
                 String type = "NONE";
@@ -398,7 +392,6 @@ public class Main implements Screen, InputProcessor {
                         type = "JUNK";
                         break;
                 }
-                Gdx.app.log("Entity type: ", type);
             }
         }
 
