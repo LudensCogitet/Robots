@@ -31,7 +31,7 @@ public class Player extends Entity implements InputProcessor {
     private boolean ignoreInput = false;
 
     Player(int position, Main gameScreen) {
-        super(TYPE.PLAYER, position, 0.4f, gameScreen.robotsGameRef.graphics.get(RobotsGame.SPRITE_INFO.PLAYER_WALKING.INDEX), false);
+        super(TYPE.PLAYER, position, 0.2f, gameScreen.robotsGameRef.graphics.get(RobotsGame.SPRITE_INFO.PLAYER_WALKING.INDEX), false);
         this.parent = gameScreen;
         this.phantom = this.parent.robotsGameRef.graphics.get(RobotsGame.SPRITE_INFO.PLAYER_STANDING.INDEX).get(0);
         this.phantomPosition = new Vector2(this.position);
@@ -44,6 +44,8 @@ public class Player extends Entity implements InputProcessor {
                 this.parent.addJunk(other.getPositionIndex());
             case JUNK:
                 this.parent.lose();
+            case CHIP:
+                this.parent.collectChip(other);
         }
     }
 

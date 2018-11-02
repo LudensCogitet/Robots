@@ -17,7 +17,7 @@ public class Hatch extends Entity {
     @Override
     public void draw(float delta, SpriteBatch batch) {
         batch.draw(
-                this.open ? this.sprite.getKeyFrame(1) : this.sprite.getKeyFrame(0),
+                this.open ? this.sprite.getFrame(1) : this.sprite.getFrame(0),
                 Playfield.getScreenX((int) this.position.x),
                 Playfield.getScreenY((int) this.position.y)
         );

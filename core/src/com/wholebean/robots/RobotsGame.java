@@ -28,14 +28,15 @@ public class RobotsGame extends com.badlogic.gdx.Game {
 		LANDSCAPE
 	}
 
-	private static final int SPRITE_COUNT = 6;
+	private static final int SPRITE_COUNT = 7;
 	public enum SPRITE_INFO {
 		PLAYER_STANDING(0, 1),
 		PLAYER_WALKING(1, 3),
 		WALL_STATIC(2, 2),
 		JUNK_IDLE(3, 2),
 		ROBOT_IDLE(4, 3),
-		HATCH(5, 2);
+		HATCH(5, 2),
+		CHIP(6, 1);
 
 		SPRITE_INFO(int index, int frameCount) {
 			this.INDEX 		 = index;

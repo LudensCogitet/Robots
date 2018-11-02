@@ -45,6 +45,9 @@ public class Main implements Screen, InputProcessor {
 
     private float timeElapsed = 0;
 
+    private int score = 0;
+
+    private int chipsCollected = 0;
     private int robotsOnField = 0;
     private int robotsKilled = 0;
     private int currentLevel = 0;
@@ -214,6 +217,13 @@ public class Main implements Screen, InputProcessor {
         this.robotsKilled++;
         this.robotsOnField--;
         robot.deactivate();
+    }
+
+    public void collectChip(Entity chip) {
+        if(chip.type != Entity.TYPE.CHIP) { return; }
+
+        chip.deactivate();
+        this.chipsCollected++;
     }
 
     public Array<Entity> entitiesAt(int position) {
@@ -459,6 +469,7 @@ public class Main implements Screen, InputProcessor {
             if(this.gameState == WIN) {
                 this.currentLevel++;
             } else {
+                this.score = 0;
                 this.currentLevel = 0;
             }
 

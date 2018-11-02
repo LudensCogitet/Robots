@@ -17,7 +17,8 @@ public class Entity implements Drawable {
         ROBOT,
         WALL,
         JUNK,
-        HATCH
+        HATCH,
+        CHIP
     }
 
     public enum VERB {
@@ -28,8 +29,7 @@ public class Entity implements Drawable {
     }
 
     protected Vector2 position;
-    protected Animation<TextureRegion> sprite;
-    protected float accumulator = 0;
+    protected Sprite sprite;
     protected TYPE type;
     protected boolean solid;
     protected boolean inactive = false;
@@ -38,19 +38,17 @@ public class Entity implements Drawable {
         this.type = type;
         this.solid = solid;
         this.position = Utils.coordsFromIndex(position, Playfield.width);
-        this.sprite = new Animation<TextureRegion>(animationSpeed, sprite);
-        this.sprite.setPlayMode(Animation.PlayMode.LOOP_PINGPONG);
+        this.sprite = new Sprite(sprite, animationSpeed, Sprite.ANIMATION_TYPE.PINGPONG, true);
+        this.sprite.start();
     }
 
     public void act() {}
     public void react() {}
     public void react(Entity other, VERB verb) {}
-    public void update(float delta) {
-        this.accumulator += delta;
-    }
+    public void update(float delta) { this.sprite.update(delta); }
     public void draw(float delta, SpriteBatch batch) {
         batch.draw(
-                this.sprite.getKeyFrame(this.accumulator),
+                this.sprite.getFrame(),
                 Playfield.getScreenX((int) this.position.x),
                 Playfield.getScreenY((int) this.position.y)
         );
@@ -78,7 +76,7 @@ public class Entity implements Drawable {
 
     public void reset(int position) {
         this.position = Utils.coordsFromIndex(position, Playfield.width);
-        this.accumulator = 0;
+        this.sprite.start();
         this.activate();
     }
 }

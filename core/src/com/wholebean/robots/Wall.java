@@ -14,7 +14,7 @@ public class Wall extends Entity {
     @Override
     public void draw(float delta, SpriteBatch batch) {
         batch.draw(
-                this.solid ? this.sprite.getKeyFrame(0) : this.sprite.getKeyFrame(1),
+                this.solid ? this.sprite.getFrame(0) : this.sprite.getFrame(1),
                 Playfield.getScreenX((int) this.position.x),
                 Playfield.getScreenY((int) this.position.y)
         );
