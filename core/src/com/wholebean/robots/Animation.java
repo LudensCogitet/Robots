@@ -7,7 +7,7 @@ import com.badlogic.gdx.utils.Array;
  * Created by john on 11/1/18.
  */
 
-public class Sprite {
+public class Animation {
     public enum ANIMATION_TYPE {
         FORWARD,
         BACKWARD,
@@ -27,7 +27,7 @@ public class Sprite {
 
     protected ANIMATION_TYPE animationType;
 
-    Sprite(Array<TextureRegion> frames, float playbackSpeed, ANIMATION_TYPE animationType, boolean looping) {
+    Animation(Array<TextureRegion> frames, float playbackSpeed, ANIMATION_TYPE animationType, boolean looping) {
         this.frames = new Array<TextureRegion>(frames);
         this.animationType = animationType;
         this.looping = looping;

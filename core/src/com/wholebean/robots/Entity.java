@@ -1,6 +1,5 @@
 package com.wholebean.robots;
 
-import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
@@ -29,7 +28,7 @@ public class Entity implements Drawable {
     }
 
     protected Vector2 position;
-    protected Sprite sprite;
+    protected Animation animation;
     protected TYPE type;
     protected boolean solid;
     protected boolean inactive = false;
@@ -38,17 +37,17 @@ public class Entity implements Drawable {
         this.type = type;
         this.solid = solid;
         this.position = Utils.coordsFromIndex(position, Playfield.width);
-        this.sprite = new Sprite(sprite, animationSpeed, Sprite.ANIMATION_TYPE.PINGPONG, true);
-        this.sprite.start();
+        this.animation = new Animation(sprite, animationSpeed, Animation.ANIMATION_TYPE.PINGPONG, true);
+        this.animation.start();
     }
 
     public void act() {}
     public void react() {}
     public void react(Entity other, VERB verb) {}
-    public void update(float delta) { this.sprite.update(delta); }
+    public void update(float delta) { this.animation.update(delta); }
     public void draw(float delta, SpriteBatch batch) {
         batch.draw(
-                this.sprite.getFrame(),
+                this.animation.getFrame(),
                 Playfield.getScreenX((int) this.position.x),
                 Playfield.getScreenY((int) this.position.y)
         );
@@ -76,7 +75,7 @@ public class Entity implements Drawable {
 
     public void reset(int position) {
         this.position = Utils.coordsFromIndex(position, Playfield.width);
-        this.sprite.start();
+        this.animation.start();
         this.activate();
     }
 }

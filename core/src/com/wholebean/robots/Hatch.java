@@ -1,7 +1,6 @@
 package com.wholebean.robots;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 /**
  * Created by john on 9/24/18.
@@ -17,7 +16,7 @@ public class Hatch extends Entity {
     @Override
     public void draw(float delta, SpriteBatch batch) {
         batch.draw(
-                this.open ? this.sprite.getFrame(1) : this.sprite.getFrame(0),
+                this.open ? this.animation.getFrame(1) : this.animation.getFrame(0),
                 Playfield.getScreenX((int) this.position.x),
                 Playfield.getScreenY((int) this.position.y)
         );
