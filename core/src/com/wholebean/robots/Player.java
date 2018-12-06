@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
+import static com.wholebean.robots.Entity.TYPE.CHIP;
 import static com.wholebean.robots.Entity.TYPE.JUNK;
 import static com.wholebean.robots.Entity.TYPE.ROBOT;
 
@@ -43,6 +44,7 @@ public class Player extends Entity implements InputProcessor {
                 this.parent.addJunk(other.getPositionIndex());
             case JUNK:
                 this.parent.lose();
+                break;
             case CHIP:
                 this.parent.collectChip(other);
         }
@@ -125,9 +127,8 @@ public class Player extends Entity implements InputProcessor {
             if(entities != null) {
                 for(int i = 0; i < entities.size; i++) {
                     Entity entity = entities.get(i);
-                    if(entity.type == JUNK || entity.type == ROBOT) {
+                    if(entity.type == JUNK || entity.type == ROBOT || entity.type == CHIP) {
                         this.checkCollision(entity);
-                        break;
                     }
                 }
             }

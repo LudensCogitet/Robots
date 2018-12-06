@@ -36,7 +36,7 @@ public class RobotsGame extends com.badlogic.gdx.Game {
 		JUNK_IDLE(3, 2),
 		ROBOT_IDLE(4, 3),
 		HATCH(5, 2),
-		CHIP(6, 1);
+		CHIP(6, 2);
 
 		SPRITE_INFO(int index, int frameCount) {
 			this.INDEX 		 = index;

@@ -9,14 +9,13 @@
 			const HATCH = 2;
 			const PLAYER = 3;
 			const ROBOT = 4;
-			const CHIP = 5;
 			const types = [
 				{name: 'nothing'},
 				{name: 'wall'},
 				{name: 'hatch'},
 				{name: 'player'},
-				{name: 'robot'},
-				{name: 'chip'}
+			{name: 'robot'},
+			
 			];
 
 			const WIDTH = 16;
@@ -258,7 +257,6 @@
 			.hatch {background-color: gray;}
 			.player {background-color: lightblue;}
 			.robot {background-color: green;}
-			.chip {background-color: yellow;}
 
 			textarea {
 				width: 300px;

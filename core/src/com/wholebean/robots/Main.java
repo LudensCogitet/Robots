@@ -36,7 +36,7 @@ public class Main implements Screen, InputProcessor {
     //private Label seedDisplay;
     private Label timeElapsedLabel;
     private Label levelLabel;
-    private Label robotsLeftLabel;
+    private Label chipsLeftLabel;
 
     private Label titleLabel;
     private Label subtitleLabel;
@@ -47,6 +47,7 @@ public class Main implements Screen, InputProcessor {
 
     private int score = 0;
 
+    private int chipsTotal = 0;
     private int chipsCollected = 0;
     private int robotsOnField = 0;
     private int robotsKilled = 0;
@@ -71,19 +72,7 @@ public class Main implements Screen, InputProcessor {
             act();
             resolve();
             cleanUpEntities();
-            if(robotsOnField + robotsKilled < playfield.robotsToKill) {
-                spawn();
-            }
-            robotsLeftLabel.setText((robotsKilled < 10 ? "0" + Integer.toString(robotsKilled) : Integer.toString(robotsKilled)) + "/" + Integer.toString(playfield.robotsToKill));
-            robotsLeftLabel.pack();
-
-            if(gameState == PLAYING && robotsKilled == playfield.robotsToKill) {
-                win();
-            }
-
-            if(!suddenDeath) {
-                checkSuddenDeath();
-            }
+            spawn();
         }
     };
 
@@ -107,8 +96,8 @@ public class Main implements Screen, InputProcessor {
         this.levelLabel = new Label(Integer.toString(this.currentLevel + 1), indicatorStyle);
         this.levelLabel.setPosition((Playfield.logicalScreenWidth / 2) - 4, indicatorLabelY);
 
-        this.robotsLeftLabel = new Label("00/00", indicatorStyle);
-        this.robotsLeftLabel.setPosition(Playfield.logicalScreenWidth - Playfield.spaceSize * 4, indicatorLabelY);
+        this.chipsLeftLabel = new Label("00/00", indicatorStyle);
+        this.chipsLeftLabel.setPosition(Playfield.logicalScreenWidth - Playfield.spaceSize * 4, indicatorLabelY);
 
         Label.LabelStyle pauseStyle = new Label.LabelStyle();
 
@@ -129,7 +118,7 @@ public class Main implements Screen, InputProcessor {
         this.ui.addActor(new Image(this.robotsGameRef.overlay));
         this.ui.addActor(this.timeElapsedLabel);
         this.ui.addActor(this.levelLabel);
-        this.ui.addActor(this.robotsLeftLabel);
+        this.ui.addActor(this.chipsLeftLabel);
         this.ui.addActor(this.notifications);
 
         this.playfield = new Playfield(this, new String[]{"level0", "level1", "level2"});
@@ -150,12 +139,7 @@ public class Main implements Screen, InputProcessor {
     private void spawn() {
         this.playfield.closeHatches();
 
-        Array<Robot> newRobots = this.playfield.spawnRobots(
-                MathUtils.clamp(
-                        this.playfield.robotDensity - this.robotsOnField,
-                        0,
-                        this.playfield.robotsToKill - (robotsOnField + robotsKilled))
-        );
+        Array<Robot> newRobots = this.playfield.spawnRobots(this.playfield.robotDensity - this.robotsOnField);
 
         if(newRobots != null) {
             this.robotsOnField += newRobots.size;
@@ -211,6 +195,10 @@ public class Main implements Screen, InputProcessor {
         this.entities.add(this.getRobot(position));
         this.robotsOnField++;
     }
+    public void addChip(int position) {
+        this.chipsTotal++;
+        this.entities.add(new Chip(position, this));
+    }
 
     public void killRobot(Entity robot) {
         if(robot.type != Entity.TYPE.ROBOT) { return; }
@@ -222,8 +210,15 @@ public class Main implements Screen, InputProcessor {
     public void collectChip(Entity chip) {
         if(chip.type != Entity.TYPE.CHIP) { return; }
 
-        chip.deactivate();
+        this.entities.removeValue(chip, true);
         this.chipsCollected++;
+
+        this.chipsLeftLabel.setText((robotsKilled < 10 ? "0" + Integer.toString(robotsKilled) : Integer.toString(robotsKilled)) + "/" + Integer.toString(playfield.robotsToKill));
+        this.chipsLeftLabel.pack();
+
+        if(gameState == PLAYING && this.chipsCollected == this.chipsTotal) {
+            win();
+        }
     }
 
     public Array<Entity> entitiesAt(int position) {
@@ -318,6 +313,8 @@ public class Main implements Screen, InputProcessor {
         this.entities.clear();
         this.robotsKilled = 0;
         this.robotsOnField = 0;
+        this.chipsCollected = 0;
+        this.chipsTotal = 0;
         this.timeElapsed = 0;
         this.suddenDeath = false;
         this.player.reset(this.playfield.loadBoard(
@@ -330,9 +327,6 @@ public class Main implements Screen, InputProcessor {
 
         this.levelLabel.setText(Integer.toString(this.currentLevel));
         this.levelLabel.pack();
-
-        this.robotsLeftLabel.setText((robotsKilled < 10 ? "0" + Integer.toString(robotsKilled) : Integer.toString(robotsKilled)) + "/" + Integer.toString(playfield.robotsToKill));
-        this.robotsLeftLabel.pack();
 
         this.timeElapsedLabel.setText("00:00");
         this.timeElapsedLabel.pack();
@@ -364,6 +358,9 @@ public class Main implements Screen, InputProcessor {
 
         this.levelLabel.setText(Integer.toString(this.currentLevel +1));
         this.levelLabel.pack();
+
+        chipsLeftLabel.setText((chipsCollected < 10 ? "0" + Integer.toString(chipsCollected) : Integer.toString(chipsCollected)) + "/" + Integer.toString(chipsTotal));
+        chipsLeftLabel.pack();
 
         if(this.gameState == PLAYING) {
             this.timeElapsed += delta;

@@ -24,6 +24,7 @@ public class Playfield implements Drawable {
     private static final int HATCH = 2;
     private static final int PLAYER = 3;
     private static final int ROBOT = 4;
+    private static final int CHIP = 5;
 
     public static final int logicalScreenWidth = 270;
     public static final int logicalScreenHeight = 480;
@@ -194,6 +195,9 @@ public class Playfield implements Drawable {
                 this.board.set(pos, null);
             } else if(board[i] == ROBOT) {
               this.parent.addRobot(pos);
+              this.board.set(pos, null);
+            } else if(board[i] == CHIP) {
+              this.parent.addChip(pos);
               this.board.set(pos, null);
             } else {
                 this.board.set(pos, null);
